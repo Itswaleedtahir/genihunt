@@ -7,7 +7,7 @@ const sendEmail = (reciever, source, content) => {
         const msg = {
             to: reciever, // Change to your recipient
             from: source, // Change to your verified sender
-            subject: 'Reset Password',
+            subject: 'Reset Password',//ghjf
             html: content
         };
         return sgMail.send(msg);
