@@ -2,6 +2,8 @@ const { SignUp } = require("../models/index");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+
+//Reset Password API
 module.exports = {
   reset: async (req, res) => {
     try {
