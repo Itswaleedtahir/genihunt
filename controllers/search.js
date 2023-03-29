@@ -161,6 +161,7 @@ Muncipality: async (req,res)=>{
     .send(err.message || "Something went wrong...");
   }
 },
+//Initial  state data
 initialdata: async (req,res)=>{
   try {
     const initialdata = await TotalData.findAll({ order: Sequelize.literal('rand()'), limit: 9  });
