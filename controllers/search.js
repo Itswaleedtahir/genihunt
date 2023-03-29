@@ -64,6 +64,7 @@ module.exports = {
         .send(err.message || "Something went wrong...");
     }
   },
+  //DROPDOWN: function.................
   Type: async (req, res) => {
     try {
       const comp = await TotalData.findAll({
