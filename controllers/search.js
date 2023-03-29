@@ -4,6 +4,7 @@ const { NUMBER } = require("sequelize");
 const { LogoScrape } = require('logo-scrape');
 
 module.exports = {
+  //main API
   data: async (req, res) => {
     try {
       
