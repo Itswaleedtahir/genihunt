@@ -81,7 +81,7 @@ module.exports = {
         .send(err.message || "Something went wrong...");
     }
   },
-  //Verifiction API
+  //Verifiction API.......................................
   Verified: async (req, res) => {
     try {
       const token = req.params.token;
