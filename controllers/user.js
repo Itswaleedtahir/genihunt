@@ -81,6 +81,31 @@ module.exports = {
         .send(err.message || "Something went wrong...");
     }
   },
+  Verified: async (req, res) => {
+    try {
+      const token = req.params.token;
+      const decoded = jwt.verify(token, process.env.jwtPrivateKey);
+      const user = decoded;
+      let updatedUser = await SignUp.update(
+        {
+          isverified: true,
+        },
+        {
+          where: { id: user.id },
+          returning: true,
+        }
+      );
+      const userafter = await SignUp.findOne({
+        where: { id: user.id },
+      });
+      return res.send(userafter);
+    } catch (err) {
+      console.log(err);
+      return res
+        .status(err.status || 500)
+        .send(err.message || "Something went wrong...");
+    }
+  },
   //logIn API................................................................
   logIn: async (req, res) => {
     try {
