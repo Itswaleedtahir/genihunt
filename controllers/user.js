@@ -22,12 +22,29 @@ module.exports = {
 
       const salt = await bcrypt.genSalt(10);
       const hashedpassword = await bcrypt.hash(password, salt);
-      console.log(hashedpassword);
-      let user = await SignUp.create({
+      let userNew = await SignUp.create({
         firstname: firstname,
         lastname: lastname,
         email: email,
         password: hashedpassword,
+      });
+      const customer = await stripe.customers.create({
+        name: userNew.firstname + " " + userNew.lastname,
+        email: userNew.email,
+      });
+      let updatedUser = await SignUp.update(
+        {
+          customer_stripe_id: customer.id,
+        },
+        {
+          where: { id: Number(userNew.dataValues.id) },
+          returning: true,
+        }
+      );
+      const user = await SignUp.findOne({
+        where: {
+          id: Number(userNew.dataValues.id),
+        },
       });
       const token = jwt.sign(
         {
@@ -35,14 +52,30 @@ module.exports = {
           firstname: user.firstname,
           lastname: user.lastname,
           email: user.email,
+          customer_stripe_id: user.customer_stripe_id,
+          isverified: user.isverified,
+          isSucbscription: user.isSucbscription,
+          current_period_start: user.current_period_start,
+          current_period_end: user.current_period_end,
         },
         process.env.jwtPrivateKey
       );
-      await user.save();
-      res
-        .header("x-auth-token", token)
-        .send(_.pick(user, ["email", "firstname", "lastname", "password"]));
+      await userNew.save();
+      const link = `http://vimentobackend-env.eba-dmebp3sv.eu-west-1.elasticbeanstalk.com/verified/${token}`;
+
+      await sendEmail(
+        email,
+        "wal@k2x.tech",
+        `<div>
+                    Click the link below to verify your email<br/>
+                    <a href="${link}">Verify Email</a>
+                </div>`
+      );
+      return res.status(200).send({
+        message: "Verificarion link has been successfully sent to your inbox",
+      });
     } catch (err) {
+      console.log(err);
       return res
         .status(err.status || 500)
         .send(err.message || "Something went wrong...");
