@@ -108,7 +108,7 @@ module.exports = {
     }
   },
   //logIn API................................................................
-  logIn: async (req, res) => {
+ logIn: async (req, res) => {
     try {
       const { email, password } = req.body;
       if (!email || !password) {
@@ -119,9 +119,11 @@ module.exports = {
           email: email,
         },
       });
-      console.log(password);
       if (!user) {
-        throw { status: 409, message: "Invalid email " };
+        throw { status: 409, message: "Invalid email or password." };
+      }
+      if (user.dataValues.isverified === false) {
+        throw { status: 409, message: "Please verify your email" };
       }
 
       let validPassword = await bcrypt.compare(
@@ -130,18 +132,25 @@ module.exports = {
       );
       if (!validPassword)
         return res.status(400).send("Invalid email or password.");
+      console.log(user);
       const token = jwt.sign(
         {
           id: user.id,
           firstname: user.firstname,
           lastname: user.lastname,
           email: user.email,
-          picture:user.picture
+          picture: user.picture,
+          isverified: user.isverified,
+          customer_stripe_id: user.customer_stripe_id,
+          isSucbscription: user.isSucbscription,
+          current_period_start: user.current_period_start,
+          current_period_end: user.current_period_end,
         },
         process.env.jwtPrivateKey
       );
       res.send(token);
     } catch (err) {
+      console.log(err);
       return res
         .status(err.status || 500)
         .send(err.message || "Something went wrong...");
